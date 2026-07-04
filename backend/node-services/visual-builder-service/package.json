@@ -1,0 +1,8 @@
+﻿{
+  "name": "visual-builder-service",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Marketplace visual-builder-service skeleton",
+  "main": "src/index.js",
+  "scripts": {}
+}
