@@ -1,5 +1,6 @@
 package com.marketplace.user.service.impl;
 
+import com.marketplace.user.dto.request.CreateUserProfileRequest;
 import com.marketplace.user.dto.request.UpdateProfileRequest;
 import com.marketplace.user.dto.response.UserProfileResponse;
 import com.marketplace.user.entity.UserProfile;
@@ -8,9 +9,9 @@ import com.marketplace.user.exception.UserProfileNotFoundException;
 import com.marketplace.user.mapper.UserProfileMapper;
 import com.marketplace.user.repository.UserProfileRepository;
 import com.marketplace.user.service.UserProfileService;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -24,20 +25,16 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileMapper mapper;
 
     @Override
-    public UserProfileResponse createProfile(
-            UUID authUserId,
-            String email,
-            String fullName
-    ) {
+    public UserProfileResponse createProfile(CreateUserProfileRequest request) {
 
-        if (repository.existsByAuthUserId(authUserId)) {
+        if (repository.existsByAuthUserId(request.getAuthUserId())) {
             throw new UserProfileAlreadyExistsException();
         }
 
         UserProfile profile = UserProfile.builder()
-                .authUserId(authUserId)
-                .email(email)
-                .fullName(fullName)
+                .authUserId(request.getAuthUserId())
+                .email(request.getEmail())
+                .fullName(request.getFullName())
                 .active(true)
                 .build();
 
@@ -71,4 +68,5 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         return mapper.toResponse(profile);
     }
+
 }
