@@ -29,6 +29,9 @@
         <java.version>25</java.version>
         <spring-boot.version>3.5.3</spring-boot.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
+
+        <jjwt.version>0.12.7</jjwt.version>
+
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -50,37 +53,54 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
-<build>
-    <pluginManagement>
-        <plugins>
+    <build>
+        <pluginManagement>
+            <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
 
-                <configuration>
+                    <configuration>
 
-                    <release>${java.version}</release>
+                        <release>${java.version}</release>
 
-                    <annotationProcessorPaths>
+                        <annotationProcessorPaths>
 
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.38</version>
-                        </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>1.18.38</version>
+                            </path>
 
-                    </annotationProcessorPaths>
+                        </annotationProcessorPaths>
 
-                </configuration>
+                    </configuration>
 
-            </plugin>
+                </plugin>
 
-        </plugins>
-    </pluginManagement>
-</build>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

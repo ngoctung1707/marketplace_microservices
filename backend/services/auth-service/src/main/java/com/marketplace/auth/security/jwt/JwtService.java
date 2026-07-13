@@ -42,7 +42,7 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractUsername(String token) { //email
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -64,13 +64,17 @@ public class JwtService {
                 .before(new Date());
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+public boolean isTokenValid(String token) {
+    return !isTokenExpired(token);
+}
 
-        String username = extractUsername(token);
+public String extractUserId(String token) {
+    return extractClaim(token, claims -> claims.get("userId", String.class));
+}
 
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
-    }
+public String extractRole(String token) {
+    return extractClaim(token, claims -> claims.get("role", String.class));
+}
 
     // refresh token 
     public String generateRefreshToken(User user) {

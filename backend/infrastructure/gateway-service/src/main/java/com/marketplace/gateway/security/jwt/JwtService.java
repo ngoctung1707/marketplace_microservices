@@ -1,0 +1,61 @@
+package com.marketplace.gateway.security.jwt;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.function.Function;
+
+@Service
+public class JwtService {
+
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public <T> T extractClaim(String token,
+                              Function<Claims, T> resolver) {
+
+        return resolver.apply(extractAllClaims(token));
+    }
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractUserId(String token) {
+        return extractClaim(token,
+                claims -> claims.get("userId", String.class));
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token,
+                claims -> claims.get("role", String.class));
+    }
+
+    public boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration)
+                .before(new Date());
+    }
+
+    public boolean isTokenValid(String token) {
+        return !isTokenExpired(token);
+    }
+}
