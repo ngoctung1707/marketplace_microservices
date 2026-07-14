@@ -1,6 +1,5 @@
 package com.marketplace.auth.entity;
 
-import com.marketplace.auth.entity.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

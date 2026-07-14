@@ -1,3 +1,42 @@
-﻿spring:
+﻿server:
+  port: 8083
+
+spring:
   application:
     name: shop-service
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/marketplace_db
+    username: marketplace
+    password: marketplace123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+jwt:
+  secret-key: 1234567890123456789012345678901234567890123456789012345678901234
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000

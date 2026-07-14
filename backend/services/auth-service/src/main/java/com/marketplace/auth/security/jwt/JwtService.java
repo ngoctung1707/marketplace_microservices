@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -42,7 +41,7 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractUsername(String token) { //email
+    public String extractUsername(String token) { // email
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -64,19 +63,19 @@ public class JwtService {
                 .before(new Date());
     }
 
-public boolean isTokenValid(String token) {
-    return !isTokenExpired(token);
-}
+    public boolean isTokenValid(String token) {
+        return !isTokenExpired(token);
+    }
 
-public String extractUserId(String token) {
-    return extractClaim(token, claims -> claims.get("userId", String.class));
-}
+    public String extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", String.class));
+    }
 
-public String extractRole(String token) {
-    return extractClaim(token, claims -> claims.get("role", String.class));
-}
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
 
-    // refresh token 
+    // refresh token
     public String generateRefreshToken(User user) {
 
         return Jwts.builder()

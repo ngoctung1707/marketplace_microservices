@@ -1,5 +1,7 @@
 package com.marketplace.auth.service;
 
+import com.marketplace.auth.client.UserServiceClient;
+import com.marketplace.auth.client.dto.CreateUserProfileRequest;
 import com.marketplace.auth.dto.request.LoginRequest;
 import com.marketplace.auth.dto.request.LogoutRequest;
 import com.marketplace.auth.dto.request.RefreshTokenRequest;
@@ -11,9 +13,11 @@ import com.marketplace.auth.entity.User;
 import com.marketplace.auth.exception.EmailAlreadyExistsException;
 import com.marketplace.auth.exception.InvalidCredentialsException;
 import com.marketplace.auth.exception.InvalidRefreshTokenException;
+import com.marketplace.auth.exception.UserProfileCreationException;
 import com.marketplace.auth.repository.RefreshTokenRepository;
 import com.marketplace.auth.repository.UserRepository;
 import com.marketplace.auth.security.jwt.JwtService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,9 +34,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserServiceClient userServiceClient;
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
@@ -47,6 +53,25 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        CreateUserProfileRequest profileRequest =
+                CreateUserProfileRequest.builder()
+                        .authUserId(savedUser.getId())
+                        .email(savedUser.getEmail())
+                        .fullName(savedUser.getFullName())
+                        .build();
+
+        try {
+
+            userServiceClient.createProfile(profileRequest);
+
+        } catch (FeignException ex) {
+
+            // Xóa User nếu tạo UserProfile thất bại
+            userRepository.delete(savedUser);
+
+            throw new UserProfileCreationException(ex);
+        }
+
         return RegisterResponse.builder()
                 .id(savedUser.getId())
                 .email(savedUser.getEmail())
@@ -54,6 +79,7 @@ public class AuthService {
                 .message("User registered successfully")
                 .build();
     }
+
 
     @Transactional
     public LoginResponse login(LoginRequest request) {
