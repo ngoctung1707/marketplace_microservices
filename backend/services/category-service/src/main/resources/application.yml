@@ -1,9 +1,9 @@
 ﻿server:
-  port: 8086
+  port: 8085
 
 spring:
   application:
-    name: order-service
+    name: category-service
   output:
     ansi:
       enabled: ALWAYS

@@ -4,6 +4,9 @@
 spring:
   application:
     name: shop-service
+  output:
+    ansi:
+      enabled: ALWAYS
 
   config:
     import: optional:configserver:http://localhost:8888

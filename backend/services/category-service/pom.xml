@@ -11,10 +11,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>order-service</artifactId>
+    <artifactId>category-service</artifactId>
     <packaging>jar</packaging>
 
-    <name>order-service</name>
+    <name>category-service</name>
 
     <dependencies>
 

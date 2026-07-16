@@ -23,6 +23,7 @@
         <module>services/product-service</module>
         <module>services/order-service</module>
         <module>services/review-service</module>
+        <module>services/category-service</module>
     </modules>
 
     <properties>
@@ -73,16 +74,16 @@
             </dependency>
 
             <dependency>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct</artifactId>
-    <version>${mapstruct.version}</version>
-</dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
 
-<dependency>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct-processor</artifactId>
-    <version>${mapstruct.version}</version>
-</dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -108,10 +109,11 @@
                             </path>
 
                             <path>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct-processor</artifactId>
-    <version>${mapstruct.version}</version>
-</path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+
 
                         </annotationProcessorPaths>
 
@@ -119,10 +121,10 @@
 
                 </plugin>
                 <plugin>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-maven-plugin</artifactId>
-    <version>${spring-boot.version}</version>
-</plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
 
             </plugins>
         </pluginManagement>
