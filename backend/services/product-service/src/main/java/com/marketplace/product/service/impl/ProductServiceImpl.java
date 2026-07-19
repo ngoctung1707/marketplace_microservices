@@ -71,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
         product.setSlug(slug);
         product.setStatus(ProductStatus.DRAFT);
 
-        Product savedProduct = repository.save(product);
+        Product savedProduct = repository.saveAndFlush(product);
 
         System.out.println("===== AFTER SAVE =====");
         System.out.println(savedProduct.getCreatedAt());
