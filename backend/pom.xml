@@ -24,6 +24,7 @@
         <module>services/order-service</module>
         <module>services/review-service</module>
         <module>services/category-service</module>
+        <module>services/inventory-service</module>
     </modules>
 
     <properties>

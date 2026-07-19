@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.marketplace.order.client.inventory.InventoryClientService;
 import com.marketplace.order.client.product.ProductClientService;
 import com.marketplace.order.client.product.dto.InternalProductResponse;
 import com.marketplace.order.client.product.dto.ProductStatus;
@@ -37,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final OrderMapper orderMapper;
     private final ProductClientService productClientService;
+    private final InventoryClientService inventoryClientService;
 
     private String generateOrderCode() {
 
@@ -57,14 +59,11 @@ public class OrderServiceImpl implements OrderService {
         return Order.builder()
                 .userId(request.getUserId())
                 .orderCode(orderCode)
-
                 .receiverName(request.getReceiverName())
                 .receiverPhone(request.getReceiverPhone())
                 .shippingAddress(request.getShippingAddress())
-
                 .status(OrderStatus.PENDING)
                 .paymentStatus(PaymentStatus.UNPAID)
-
                 .subtotal(BigDecimal.ZERO)
                 .shippingFee(BigDecimal.ZERO)
                 .discount(BigDecimal.ZERO)
@@ -159,6 +158,24 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    private void reserveInventory(List<OrderItem> orderItems) {
+
+        for (OrderItem item : orderItems) {
+
+            inventoryClientService.reserveStock(item.getProductId(), item.getQuantity());
+
+        }
+    }
+
+    private void releaseInventory(List<OrderItem> orderItems) {
+
+        for (OrderItem item : orderItems) {
+
+            inventoryClientService.releaseStock(item.getProductId(), item.getQuantity());
+
+        }
+    }
+
     @Override
     public OrderResponse createOrder(CreateOrderRequest request) {
 
@@ -170,53 +187,53 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderItems(orderItems);
 
+        reserveInventory(orderItems);
+
         calculateOrderAmount(order);
 
-        // Lưu Order
-        Order savedOrder = orderRepository.saveAndFlush(order);
+        try {
+            Order savedOrder = orderRepository.saveAndFlush(order);
 
-        System.out.println("===== AFTER SAVE =====");
-        System.out.println("Entity createdAt = " + savedOrder.getCreatedAt());
-        System.out.println("Entity updatedAt = " + savedOrder.getUpdatedAt());
+            savedOrder = orderRepository.findById(savedOrder.getId()).orElseThrow();
 
-        // Đọc lại từ database
-        savedOrder = orderRepository.findById(savedOrder.getId())
-                .orElseThrow();
+            return buildResponse(savedOrder);
 
-        System.out.println("===== AFTER FIND =====");
-        System.out.println("Entity createdAt = " + savedOrder.getCreatedAt());
-        System.out.println("Entity updatedAt = " + savedOrder.getUpdatedAt());
+        } catch (Exception ex) {
 
-        // Map sang Response
-        OrderResponse response = buildResponse(savedOrder);
-
-        System.out.println("===== RESPONSE =====");
-        System.out.println("Response createdAt = " + response.getCreatedAt());
-        System.out.println("Response updatedAt = " + response.getUpdatedAt());
-
-        return response;
+            releaseInventory(orderItems);
+            throw ex;
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public OrderResponse getOrder(UUID orderId) {
+
         throw new UnsupportedOperationException("Not implemented yet");
+
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByUser(UUID userId) {
+
         throw new UnsupportedOperationException("Not implemented yet");
+
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
+
         throw new UnsupportedOperationException("Not implemented yet");
+
     }
 
     @Override
     public void cancelOrder(UUID orderId) {
+
         throw new UnsupportedOperationException("Not implemented yet");
+
     }
+
 }
