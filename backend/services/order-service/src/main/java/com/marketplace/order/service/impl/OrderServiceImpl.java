@@ -14,6 +14,7 @@ import com.marketplace.order.client.inventory.InventoryClientService;
 import com.marketplace.order.client.product.ProductClientService;
 import com.marketplace.order.client.product.dto.InternalProductResponse;
 import com.marketplace.order.client.product.dto.ProductStatus;
+import com.marketplace.order.dto.internal.UpdatePaymentStatusRequest;
 import com.marketplace.order.dto.request.CreateOrderItemRequest;
 import com.marketplace.order.dto.request.CreateOrderRequest;
 import com.marketplace.order.dto.response.OrderResponse;
@@ -22,6 +23,7 @@ import com.marketplace.order.entity.OrderItem;
 import com.marketplace.order.entity.OrderStatus;
 import com.marketplace.order.entity.PaymentStatus;
 import com.marketplace.order.exception.InvalidOrderException;
+import com.marketplace.order.exception.ResourceNotFoundException;
 import com.marketplace.order.mapper.OrderMapper;
 import com.marketplace.order.repository.OrderItemRepository;
 import com.marketplace.order.repository.OrderRepository;
@@ -176,6 +178,14 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    private Order findOrderById(UUID orderId) {
+
+        return orderRepository.findByIdAndActiveTrue(orderId)
+
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
+
+    }
+
     @Override
     public OrderResponse createOrder(CreateOrderRequest request) {
 
@@ -209,7 +219,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponse getOrder(UUID orderId) {
 
-        throw new UnsupportedOperationException("Not implemented yet");
+        Order order = findOrderById(orderId);
+
+        return buildResponse(order);
 
     }
 
@@ -233,6 +245,40 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(UUID orderId) {
 
         throw new UnsupportedOperationException("Not implemented yet");
+
+    }
+
+    @Override
+    public void updatePaymentStatus(
+            UUID orderId,
+            UpdatePaymentStatusRequest request) {
+
+        Order order = findOrderById(orderId);
+
+        order.setPaymentStatus(request.getPaymentStatus());
+
+        order.setStatus(request.getOrderStatus());
+
+        if (request.getOrderStatus() == OrderStatus.CONFIRMED) {
+
+            confirmInventory(order.getOrderItems());
+
+        }
+
+        orderRepository.saveAndFlush(order);
+
+    }
+
+    private void confirmInventory(
+            List<OrderItem> orderItems) {
+
+        for (OrderItem item : orderItems) {
+
+            inventoryClientService.confirmStock(
+                    item.getProductId(),
+                    item.getQuantity());
+
+        }
 
     }
 
